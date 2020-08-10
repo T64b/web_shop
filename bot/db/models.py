@@ -52,3 +52,12 @@ class Product(me.Document):
     @classmethod
     def get_products_discount(cls):
         return cls.objects(discount__ne=0)
+
+
+class News(me.Document):
+    title = me.StringField(min_length=2, max_length=512, required=True)
+    description = me.StringField(min_length=5, max_length=4096, required=True)
+
+    @classmethod
+    def get_last_three_news(cls):
+        return cls.objects.order_by('-id')[:3]

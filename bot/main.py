@@ -5,8 +5,8 @@ from telebot.types import (
 )
 
 from .config import TOKEN
-from .db.models import Category, Product
-from .texts import GREETINGS, CHOOSE_CATEGORY
+from .db.models import Category, Product, News
+from .texts import GREETINGS, CHOOSE_CATEGORY, CHOOSE_PRODUCT, CHOOSE_NEWS
 from .keyboards import START_KB
 
 bot = TeleBot(TOKEN)
@@ -35,11 +35,24 @@ def list_of_categories(message):
 @bot.message_handler(func=lambda m: m.text == START_KB['sales'])
 def products_on_sale(message):
     kb = InlineKeyboardMarkup()
-    categories = [
+    products = [
         InlineKeyboardButton(
             product.title,
             callback_data=f'{Product.__name__}{product.id}'
         ) for product in Product.get_products_discount()
     ]
-    kb.add(*categories)
-    bot.send_message(message.chat.id, CHOOSE_CATEGORY, reply_markup=kb)
+    kb.add(*products)
+    bot.send_message(message.chat.id, CHOOSE_PRODUCT, reply_markup=kb)
+
+
+@bot.message_handler(func=lambda m: m.text == START_KB['news'])
+def last_news(message):
+    kb = InlineKeyboardMarkup()
+    news = [
+        InlineKeyboardButton(
+            news.title,
+            callback_data=f'{News.__name__}{news.id}'
+        ) for news in News.get_last_three_news()
+    ]
+    kb.add(*news)
+    bot.send_message(message.chat.id, CHOOSE_NEWS, reply_markup=kb)
