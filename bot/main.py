@@ -6,7 +6,6 @@ from telebot.types import (
 
 from .config import TOKEN, DEFAULT_PHOTO_URL
 from .db.models import Category, Product, News, Text
-from .texts import GREETINGS, CHOOSE_CATEGORY, CHOOSE_PRODUCT, CHOOSE_NEWS
 from .keyboards import START_KB
 from .lookups import PRODUCT_LOOKUP, SEPARATOR
 
@@ -23,6 +22,8 @@ def start(message):
 
 @bot.message_handler(func=lambda m: m.text == START_KB['categories'])
 def list_of_categories(message):
+    txt = Text.objects.get(title=Text.GREETINGS)
+
     kb = InlineKeyboardMarkup()
     categories = [
         InlineKeyboardButton(category.title,
@@ -30,25 +31,15 @@ def list_of_categories(message):
                              ) for category in Category.get_root_categories()
     ]
     kb.add(*categories)
-    bot.send_message(message.chat.id, CHOOSE_CATEGORY, reply_markup=kb)
+    bot.send_message(message.chat.id, txt.body, reply_markup=kb)
 
 
 @bot.message_handler(content_types=['text'],
                      func=lambda m: m.text == START_KB['sales'])
 def products_on_sale(message):
-    # txt = Text.objects.get(title=Text.DISCOUNT)
-    # kb = InlineKeyboardMarkup()
-    # products = [
-    #     InlineKeyboardButton(
-    #         product.title,
-    #         callback_data=f'{Product.__name__}{product.id}'
-    #     ) for product in Product.get_products_discount()
-    # ]
-    # kb.add(*products)
-    # bot.send_message(message.chat.id, txt.body, reply_markup=kb)
+    txt = Text.objects.get(title=Text.GREETINGS)
 
     discount_products = Product.get_products_discount()
-
     for product in discount_products:
         kb = InlineKeyboardMarkup()
         button = InlineKeyboardButton(
@@ -66,6 +57,8 @@ def products_on_sale(message):
 
 @bot.message_handler(func=lambda m: m.text == START_KB['news'])
 def last_news(message):
+    txt = Text.objects.get(title=Text.GREETINGS)
+
     kb = InlineKeyboardMarkup()
     news = [
         InlineKeyboardButton(
@@ -74,4 +67,4 @@ def last_news(message):
         ) for news in News.get_last_three_news()
     ]
     kb.add(*news)
-    bot.send_message(message.chat.id, CHOOSE_NEWS, reply_markup=kb)
+    bot.send_message(message.chat.id, txt.body, reply_markup=kb)
