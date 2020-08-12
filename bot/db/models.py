@@ -43,6 +43,16 @@ class Product(me.Document):
     price = me.DecimalField(min_value=1, force_string=True)
     parameter = me.EmbeddedDocumentField(Parameter)
     category = me.ReferenceField(Category)
+    image = me.FileField()
+
+    def set_image(self, image):
+        with open(image, 'rb') as fd:
+            self.image.put(fd, content_type='image/jpeg')
+        self.save()
+
+    @property
+    def get_image(self):
+        return self.image.read
 
     @property
     def actual_price(self):
@@ -52,6 +62,20 @@ class Product(me.Document):
     @classmethod
     def get_products_discount(cls):
         return cls.objects(discount__ne=0)
+
+
+class Text(me.Document):
+
+    GREETINGS = 'greetings'
+    DISCOUNT = 'discount'
+
+    TITLES_CONSTANTS = (
+        (GREETINGS, 'greetings'),
+        (DISCOUNT, 'discount'),
+    )
+    title = me.StringField(min_length=2, max_length=512, required=True,
+                           choices=TITLES_CONSTANTS, unique=True)
+    body = me.StringField(min_length=2, max_length=4096, required=True)
 
 
 class News(me.Document):

@@ -4,45 +4,64 @@ from telebot.types import (
     KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 )
 
-from .config import TOKEN
-from .db.models import Category, Product, News
+from .config import TOKEN, DEFAULT_PHOTO_URL
+from .db.models import Category, Product, News, Text
 from .texts import GREETINGS, CHOOSE_CATEGORY, CHOOSE_PRODUCT, CHOOSE_NEWS
 from .keyboards import START_KB
+from .lookups import PRODUCT_LOOKUP, SEPARATOR
 
 bot = TeleBot(TOKEN)
 
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    kb = ReplyKeyboardMarkup(resize_keyboard=True)
+    txt = Text.objects.get(title=Text.GREETINGS)
+    kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     kb.add(*[KeyboardButton(button) for button in START_KB.values()])
-    bot.send_message(message.chat.id, GREETINGS, reply_markup=kb)  #
+    bot.send_message(message.chat.id, txt.body, reply_markup=kb)
 
 
 @bot.message_handler(func=lambda m: m.text == START_KB['categories'])
 def list_of_categories(message):
     kb = InlineKeyboardMarkup()
     categories = [
-        InlineKeyboardButton(
-            category.title,
-            callback_data=f'{Category.__name__}{category.id}'
-        ) for category in Category.get_root_categories()
+        InlineKeyboardButton(category.title,
+                             callback_data=f'{Category.__name__}{category.id}'
+                             ) for category in Category.get_root_categories()
     ]
     kb.add(*categories)
     bot.send_message(message.chat.id, CHOOSE_CATEGORY, reply_markup=kb)
 
 
-@bot.message_handler(func=lambda m: m.text == START_KB['sales'])
+@bot.message_handler(content_types=['text'],
+                     func=lambda m: m.text == START_KB['sales'])
 def products_on_sale(message):
-    kb = InlineKeyboardMarkup()
-    products = [
-        InlineKeyboardButton(
+    # txt = Text.objects.get(title=Text.DISCOUNT)
+    # kb = InlineKeyboardMarkup()
+    # products = [
+    #     InlineKeyboardButton(
+    #         product.title,
+    #         callback_data=f'{Product.__name__}{product.id}'
+    #     ) for product in Product.get_products_discount()
+    # ]
+    # kb.add(*products)
+    # bot.send_message(message.chat.id, txt.body, reply_markup=kb)
+
+    discount_products = Product.get_products_discount()
+
+    for product in discount_products:
+        kb = InlineKeyboardMarkup()
+        button = InlineKeyboardButton(
+            text=product.title,
+            callback_data=f'{PRODUCT_LOOKUP}{SEPARATOR}{product.id}'
+        )
+        kb.add(button)
+        bot.send_photo(
+            message.chat.id,
+            product.get_image(),
             product.title,
-            callback_data=f'{Product.__name__}{product.id}'
-        ) for product in Product.get_products_discount()
-    ]
-    kb.add(*products)
-    bot.send_message(message.chat.id, CHOOSE_PRODUCT, reply_markup=kb)
+            reply_markup=kb
+        )
 
 
 @bot.message_handler(func=lambda m: m.text == START_KB['news'])
