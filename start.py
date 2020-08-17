@@ -1,4 +1,4 @@
-from bot.main import bot
+from bot.handlers import bot_instance
 
 if __name__ == '__main__':
-    bot.polling()
+    bot_instance.polling()
