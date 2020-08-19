@@ -1,9 +1,8 @@
 import time
-
 from bot.handlers import bot_instance
 from flask import Flask, abort
 from flask import request
-from bot.config import  WEBHOOK_PREFIX, WEBHOOK_URL
+from bot.config import WEBHOOK_PREFIX, WEBHOOK_URL
 from telebot.types import Update
 
 app = Flask(__name__)

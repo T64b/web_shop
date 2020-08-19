@@ -36,11 +36,11 @@ class Parameter(me.EmbeddedDocument):
 
 class Product(me.Document):
     title = me.StringField(min_length=2, max_length=512, required=True)
-    description = me.StringField(min_length=8, max_length=2048)
     in_stock = me.IntField(min_value=0, required=True)
     is_available = me.BooleanField(default=True)
-    discount = me.IntField(min_value=0, max_value=99, default=0)
     price = me.DecimalField(min_value=1, force_string=True)
+    discount = me.IntField(min_value=0, max_value=99, default=0)
+    description = me.StringField(min_length=8, max_length=2048)
     parameter = me.EmbeddedDocumentField(Parameter)
     category = me.ReferenceField(Category)
     image = me.FileField()

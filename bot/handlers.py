@@ -1,10 +1,9 @@
-from telebot import TeleBot
 from telebot.types import (
     ReplyKeyboardMarkup,
     KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 )
 
-from .config import TOKEN, DEFAULT_PHOTO_URL
+from .config import TOKEN
 from .db.models import Category, Product, News, Text
 from .keyboards import START_KB
 from .lookups import PRODUCT_LOOKUP, SEPARATOR, CATEGORY_LOOKUP
@@ -19,19 +18,6 @@ def start(message):
     kb.add(*[KeyboardButton(button) for button in START_KB.values()])
     bot_instance.send_message(message.chat.id, txt.body, reply_markup=kb)
 
-
-# @bot_instance.message_handler(func=lambda m: m.text == START_KB['categories'])
-# def list_of_categories(message):
-#     txt = Text.objects.get(title=Text.GREETINGS)
-#
-#     kb = InlineKeyboardMarkup()
-#     categories = [
-#         InlineKeyboardButton(category.title,
-#                              callback_data=f'{Category.__name__}{category.id}'
-#                              ) for category in Category.get_root_categories()
-#     ]
-#     kb.add(*categories)
-#     bot_instance.send_message(message.chat.id, txt.body, reply_markup=kb)
 
 @bot_instance.message_handler(func=lambda m: m.text == START_KB['categories'])
 def get_root_categories(message):
