@@ -1,4 +1,4 @@
-from bot.db.models import Text, Category, Product
+from .models import Text, Category, Product
 
 
 def seed_texts():
@@ -21,7 +21,15 @@ def seed_categories():
     c2 = Category.objects.create(title='Телефоны')
     c3 = Category.objects.create(title='Ноутбуки и компьютеры')
 
-    s1 = Category.objects(title='Холодильники')
+    s1 = Category.objects.create(title='Холодильники')
+    s2 = Category.objects.create(title='Микроволновые печи')
+    s3 = Category.objects.create(title='Плиты')
+
+    c1.add_subcategory(s1)
+    c1.add_subcategory(s2)
+    c1.add_subcategory(s3)
+
+
 
 
 
