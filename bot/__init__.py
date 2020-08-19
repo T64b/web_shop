@@ -1,1 +1,1 @@
-from .handlers import bot_instance
+# from .handlers import bot_instance

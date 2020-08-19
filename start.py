@@ -20,6 +20,7 @@ def webhook():
         abort(403)
 
 
+# убрать на верхний уровень
 if __name__ == '__main__':
     bot_instance.remove_webhook()
     time.sleep(1)
